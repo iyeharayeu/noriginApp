@@ -511,11 +511,8 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 Log.d(TAG, "onKey() called with: " + "v = [" + v + "], keyCode = [" + keyCode + "], event = [" + event + "]");
-                if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_ESCAPE
-                        || keyCode == KeyEvent.KEYCODE_MENU) {
-                    return false;
-                }
-                return mMediaController.dispatchKeyEvent(event);
+                return !(keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_ESCAPE
+                        || keyCode == KeyEvent.KEYCODE_MENU) && mMediaController.dispatchKeyEvent(event);
             }
         });
     }
