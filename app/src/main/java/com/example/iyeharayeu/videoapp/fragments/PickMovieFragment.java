@@ -280,6 +280,7 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
             mPlayer.seekTo(mLastPlayerPosition);
             mPlayerNeedsPrepare = true;
             mMediaController.setMediaPlayer(mPlayer.getPlayerControl());
+            Log.d(TAG, "preparePlayer() called with: " + "playWhenReady = [" + playWhenReady + "]");
             mMediaController.setEnabled(true);
             mEventLogger = new EventLogger();
             mEventLogger.startSession();
@@ -497,6 +498,7 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
         mHolder.mImagesContainer.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+                Log.d(TAG, "onTouch() called with: " + "view = [" + view + "], motionEvent = [" + motionEvent + "]");
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                     toggleControlsVisibility();
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
@@ -508,6 +510,7 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
         mHolder.mImagesContainer.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
+                Log.d(TAG, "onKey() called with: " + "v = [" + v + "], keyCode = [" + keyCode + "], event = [" + event + "]");
                 if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_ESCAPE
                         || keyCode == KeyEvent.KEYCODE_MENU) {
                     return false;
@@ -522,6 +525,7 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
         mHolder.mView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+                Log.d(TAG, "onTouch() called with: " + "view = [" + view + "], motionEvent = [" + motionEvent + "]");
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                     toggleControlsVisibility();
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {

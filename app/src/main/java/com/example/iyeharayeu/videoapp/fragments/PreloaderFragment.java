@@ -15,6 +15,8 @@ import com.example.iyeharayeu.videoapp.R;
 import com.example.iyeharayeu.videoapp.utilities.Utils;
 import com.example.iyeharayeu.videoapp.entities.MovieEntity;
 
+import java.util.Observable;
+
 public class PreloaderFragment extends BaseFragment {
 
     public static final String TAG = PreloaderFragment.class.getSimpleName();
@@ -56,6 +58,8 @@ public class PreloaderFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         mHandler.postDelayed(mRunnable, HANDLER_DELAY_MILLIS);
+
+
     }
 
     @Override

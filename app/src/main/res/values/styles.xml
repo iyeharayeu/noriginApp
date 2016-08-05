@@ -22,7 +22,8 @@
 
     <style name="styleCoverImage">
             <item name="android:layout_width">match_parent</item>
-            <item name="android:scaleType">centerCrop</item>
+            <item name="android:scaleType">centerInside</item>
+            <item name="android:adjustViewBounds">true</item>
             <item name="android:layout_height">@dimen/image_height</item>
             <item name="android:layout_margin">@dimen/activity_horizontal_margin</item>
             <item name="android:layout_weight">1</item>
