@@ -6,8 +6,6 @@ import android.support.v4.app.FragmentManager;
 
 public class ContainerController {
 
-    private static final String TAG = ContainerController.class.getSimpleName();
-
     private final FragmentManager mManager;
     private final int mContainer;
 

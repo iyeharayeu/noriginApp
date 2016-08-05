@@ -4,9 +4,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-/**
- * Created by iyeharayeu
- */
 public class StreamsEntity implements Serializable {
 
 

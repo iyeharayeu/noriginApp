@@ -20,8 +20,6 @@ import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements OnFragmentInteraction {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
-
     private static final String BUNDLE_LAST_VALUE = "bundle_last_value";
     private static final String BUNDLE_LAST_MOVIES_LIST = "last_movies_list";
     private static final String JSON_FILE_NAME = "movies.json";
