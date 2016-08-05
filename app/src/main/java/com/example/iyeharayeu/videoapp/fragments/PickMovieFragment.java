@@ -334,10 +334,9 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
                 text += "preparing";
                 break;
             case ExoPlayer.STATE_READY:
+                preparePlayer(true);
                 showProgress = false;
                 mIsVideoPrepared = true;
-                preparePlayer(true);
-
                 mActivityListener.onReadyToPlay();
                 text += "ready";
                 break;
@@ -498,7 +497,7 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
         mHolder.mImagesContainer.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                Log.d(TAG, "onTouch() called with: " + "view = [" + view + "], motionEvent = [" + motionEvent + "]");
+                Log.d(TAG, "onTouch1() called with: " + "view = [" + view + "], motionEvent = [" + motionEvent + "]");
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                     toggleControlsVisibility();
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
@@ -522,7 +521,7 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
         mHolder.mView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                Log.d(TAG, "onTouch() called with: " + "view = [" + view + "], motionEvent = [" + motionEvent + "]");
+                Log.d(TAG, "onTouch2() called with: " + "view = [" + view + "], motionEvent = [" + motionEvent + "]");
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                     toggleControlsVisibility();
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
