@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.Toast;
+
 import com.example.iyeharayeu.videoapp.R;
 import com.example.iyeharayeu.videoapp.utilities.Utils;
 import com.example.iyeharayeu.videoapp.camera.KeyCompatibleMediaController;
@@ -64,10 +65,12 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
     public static final String TAG = PickMovieFragment.class.getSimpleName();
     public static final String BUNDLE_MOVIES = "BUNDLE_MOVIES";
     public static final String BUNDLE_ID_TO_PLAY = "ID_TO_PlAY";
+    private static final String BUNDLE_PLAYER_POSITION_EXTRA = "BUNDLE_PLAYER_POSITION_EXTRA";
+    private static final String PLAY_READY_EXTRA = "PLAY_READY_EXTRA";
+    public static final String BUNDLE_IMAGES_VISIBILITY = "IMAGES_VISIBILITY";
+    public static final String BUNDLE_CONTROL_PANEL_IS_SHOWING = "BUNDLE_CONTROL_PANEL_IS_SHOWING";
 
     private static final CookieManager sDefaultCookieManager;
-    private static final String PLAYER_POSITION_EXTRA = "PLAYER_POSITION_EXTRA";
-    private static final String PLAY_READY_EXTRA = "PLAY_READY_EXTRA";
 
     static {
         sDefaultCookieManager = new CookieManager();
@@ -79,7 +82,7 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
     private EventLogger mEventLogger;
     private MediaController mMediaController;
     private DemoPlayer mPlayer;
-    private boolean mPlayerNeedsPrepare;
+    private boolean mMustPreparePlayer;
 
     private long mLastPlayerPosition;
 
@@ -90,11 +93,6 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
     private AudioCapabilitiesReceiver mAudioCapabilitiesReceiver;
     private String mIdToPlay;
     private Holder mHolder;
-
-
-
-    public PickMovieFragment() {
-    }
 
     public static PickMovieFragment newInstance(MovieListEntity entity, String idToPlay) {
         PickMovieFragment fragment = new PickMovieFragment();
@@ -114,7 +112,7 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
             mIdToPlay = getArguments().getString(BUNDLE_ID_TO_PLAY);
 
             if (savedInstanceState != null) {
-                mLastPlayerPosition = savedInstanceState.getLong(PLAYER_POSITION_EXTRA);
+                mLastPlayerPosition = savedInstanceState.getLong(BUNDLE_PLAYER_POSITION_EXTRA);
                 mIsVideoPrepared = savedInstanceState.getBoolean(PLAY_READY_EXTRA, false);
             } else {
                 mIsVideoPrepared = false;
@@ -129,7 +127,9 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
         if (mPlayer != null) {
             mLastPlayerPosition = mPlayer.getCurrentPosition();
         }
-        outState.putLong(PLAYER_POSITION_EXTRA, mLastPlayerPosition);
+        outState.putLong(BUNDLE_PLAYER_POSITION_EXTRA, mLastPlayerPosition);
+        outState.putBoolean(BUNDLE_IMAGES_VISIBILITY, (mHolder.mImagesContainer.getVisibility() == View.VISIBLE));
+        outState.putBoolean(BUNDLE_CONTROL_PANEL_IS_SHOWING, mMediaController.isShowing());
     }
 
     @Override
@@ -203,7 +203,6 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
     }
 
 
-
     // AudioCapabilitiesReceiver.Listener methods
 
     @Override
@@ -226,8 +225,7 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             preparePlayer(mIsVideoPrepared);
         } else {
-            Toast.makeText((getActivity()),  R.string.error_permission_denied,
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText((getActivity()), R.string.error_permission_denied,Toast.LENGTH_LONG).show();
         }
     }
 
@@ -254,17 +252,17 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
 
     private DemoPlayer.RendererBuilder getRendererBuilder() {
         Activity activity = getActivity();
-        String userAgent = Util.getUserAgent( activity, "videoApp");
+        String userAgent = Util.getUserAgent(activity, "videoApp");
         switch (mContentType) {
             case Util.TYPE_SS:
                 return new SmoothStreamingRendererBuilder(activity, userAgent,
-                mContentUri.toString(), new SmoothStreamingTestMediaDrmCallback());
+                        mContentUri.toString(), new SmoothStreamingTestMediaDrmCallback());
             case Util.TYPE_DASH:
                 return new DashRendererBuilder(activity, userAgent,
-                mContentUri.toString(),new WidevineTestMediaDrmCallback("", ""));
+                        mContentUri.toString(), new WidevineTestMediaDrmCallback("", ""));
             case Util.TYPE_HLS:
                 return new HlsRendererBuilder(activity, userAgent,
-                mContentUri.toString());
+                        mContentUri.toString());
             case Util.TYPE_OTHER:
                 return new ExtractorRendererBuilder(activity, userAgent, mContentUri);
             default:
@@ -273,14 +271,14 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
     }
 
     private void preparePlayer(boolean playWhenReady) {
+        Log.d(TAG, "preparePlayer() called with: " + "playWhenReady = [" + playWhenReady + "]");
         if (mPlayer == null) {
             mPlayer = new DemoPlayer(getRendererBuilder());
             mPlayer.addListener(this);
             mPlayer.setMetadataListener(this);
             mPlayer.seekTo(mLastPlayerPosition);
-            mPlayerNeedsPrepare = true;
+            mMustPreparePlayer = true;
             mMediaController.setMediaPlayer(mPlayer.getPlayerControl());
-            Log.d(TAG, "preparePlayer() called with: " + "playWhenReady = [" + playWhenReady + "]");
             mMediaController.setEnabled(true);
             mEventLogger = new EventLogger();
             mEventLogger.startSession();
@@ -289,9 +287,9 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
             mPlayer.setInternalErrorListener(mEventLogger);
         }
 
-        if (mPlayerNeedsPrepare) {
+        if (mMustPreparePlayer) {
             mPlayer.prepare();
-            mPlayerNeedsPrepare = false;
+            mMustPreparePlayer = false;
         }
 
         mPlayer.setSurface(mHolder.mSurfaceView.getHolder().getSurface());
@@ -301,7 +299,13 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
 
     private void releasePlayer() {
         if (mPlayer != null) {
+            Log.d(TAG, "releasePlayer() called with: " + "");
             mLastPlayerPosition = mPlayer.getCurrentPosition();
+            mPlayer.removeListener(this);
+            mPlayer.removeListener(mEventLogger);
+            mPlayer.setMetadataListener(null);
+            mPlayer.setInfoListener(null);
+            mPlayer.setInternalErrorListener(null);
             mPlayer.release();
             mPlayer = null;
             mEventLogger.endSession();
@@ -334,10 +338,12 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
                 text += "preparing";
                 break;
             case ExoPlayer.STATE_READY:
-                preparePlayer(true);
                 showProgress = false;
-                mIsVideoPrepared = true;
-                mActivityListener.onReadyToPlay();
+                if(!mIsVideoPrepared) {
+                    preparePlayer(true);
+                    mIsVideoPrepared = true;
+                    mActivityListener.onReadyToPlay();
+                }
                 text += "ready";
                 break;
             default:
@@ -356,11 +362,11 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
         if (e instanceof UnsupportedDrmException) {
             // Special case DRM failures.
             UnsupportedDrmException unsupportedDrmException = (UnsupportedDrmException) e;
-            errorString = Util.SDK_INT < 18 ? "drm not supported": unsupportedDrmException.reason
+            errorString = Util.SDK_INT < 18 ? "drm not supported" : unsupportedDrmException.reason
                     == UnsupportedDrmException.REASON_UNSUPPORTED_SCHEME ? "drm unsupported scheme" :
                     "error ! drm unknown";
-        } else if (e instanceof ExoPlaybackException
-                && e.getCause() instanceof MediaCodecTrackRenderer.DecoderInitializationException) {
+        } else if (e instanceof ExoPlaybackException && e.getCause() instanceof
+                MediaCodecTrackRenderer.DecoderInitializationException) {
             // Special case for decoder initialization failures.
             MediaCodecTrackRenderer.DecoderInitializationException decoderInitializationException =
                     (MediaCodecTrackRenderer.DecoderInitializationException) e.getCause();
@@ -380,7 +386,7 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
             Toast.makeText(getActivity(), errorString, Toast.LENGTH_LONG).show();
         }
 
-        mPlayerNeedsPrepare = true;
+        mMustPreparePlayer = true;
         showControls();
     }
 
@@ -453,10 +459,25 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_pick_movie, container, false);
+
         mHolder = new Holder(view);
+        restoreVisibilityState(savedInstanceState);
         return view;
     }
 
+    private void restoreVisibilityState(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            Boolean isVisible = savedInstanceState.getBoolean(BUNDLE_IMAGES_VISIBILITY, false);
+            mHolder.mImagesContainer.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
+            if (mMediaController != null) {
+                if (savedInstanceState.getBoolean(BUNDLE_CONTROL_PANEL_IS_SHOWING, false)) {
+                    mMediaController.show(0);
+                } else {
+                    mMediaController.hide();
+                }
+            }
+        }
+    }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -467,12 +488,11 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
             CookieHandler.setDefault(sDefaultCookieManager);
         }
 
-        mMediaController = new KeyCompatibleMediaController((Context)mActivityListener);
-        int orientation = ((Activity)mActivityListener).getResources().getConfiguration().orientation;
+        mMediaController = new KeyCompatibleMediaController(getActivity());
+        int orientation = getActivity().getResources().getConfiguration().orientation;
 
-        mMediaController.setAnchorView((orientation==Configuration.ORIENTATION_PORTRAIT)?mHolder.
-                mImagesContainer:mHolder.mVideoControlContainer);
-
+        mMediaController.setAnchorView((orientation == Configuration.ORIENTATION_PORTRAIT) ? mHolder.
+                mImagesContainer : mHolder.mVideoControlContainer);
 
 
         mAudioCapabilitiesReceiver = new AudioCapabilitiesReceiver(getActivity(), this);
@@ -537,12 +557,13 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
         for (int index = 0; index < (mHolder.mImagesContainer).getChildCount(); ++index) {
             MovieEntity currentEntity = mMoviesList.getMovies()[index];
             ImageView nextChild = (ImageView) (mHolder.mImagesContainer).getChildAt(index);
-            Bitmap bmp = Utils.getBitmapFromAssets((Activity) mActivityListener, currentEntity.getImages().getCover());
+            Bitmap bmp = Utils.getBitmapFromAssets(getActivity(), currentEntity.getImages().getCover());
             nextChild.setImageBitmap(bmp);
             nextChild.setTag(currentEntity);
             nextChild.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    Log.d(TAG, "onClick() called with: " + "view = [" + view + "]");
                     mHolder.mImagesContainer.setVisibility(View.INVISIBLE);
                     openAccordingToTapped((MovieEntity) view.getTag());
                 }
@@ -556,7 +577,7 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
         }
     }
 
-    private static class Holder{
+    private static class Holder {
 
         private final View mView;
         private final LinearLayout mImagesContainer;
