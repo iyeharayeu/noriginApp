@@ -2,7 +2,6 @@ package com.example.iyeharayeu.videoapp.fragments;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -68,7 +67,6 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
     private static final String BUNDLE_PLAYER_POSITION_EXTRA = "BUNDLE_PLAYER_POSITION_EXTRA";
     private static final String PLAY_READY_EXTRA = "PLAY_READY_EXTRA";
     public static final String BUNDLE_IMAGES_VISIBILITY = "IMAGES_VISIBILITY";
-    public static final String BUNDLE_CONTROL_PANEL_IS_SHOWING = "BUNDLE_CONTROL_PANEL_IS_SHOWING";
 
     private static final CookieManager sDefaultCookieManager;
 
@@ -129,7 +127,6 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
         }
         outState.putLong(BUNDLE_PLAYER_POSITION_EXTRA, mLastPlayerPosition);
         outState.putBoolean(BUNDLE_IMAGES_VISIBILITY, (mHolder.mImagesContainer.getVisibility() == View.VISIBLE));
-        outState.putBoolean(BUNDLE_CONTROL_PANEL_IS_SHOWING, mMediaController.isShowing());
     }
 
     @Override
@@ -278,6 +275,7 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
             mPlayer.setMetadataListener(this);
             mPlayer.seekTo(mLastPlayerPosition);
             mMustPreparePlayer = true;
+
             mMediaController.setMediaPlayer(mPlayer.getPlayerControl());
             mMediaController.setEnabled(true);
             mEventLogger = new EventLogger();
@@ -469,13 +467,6 @@ public class PickMovieFragment extends BaseFragment implements SurfaceHolder.Cal
         if (savedInstanceState != null) {
             Boolean isVisible = savedInstanceState.getBoolean(BUNDLE_IMAGES_VISIBILITY, false);
             mHolder.mImagesContainer.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
-            if (mMediaController != null) {
-                if (savedInstanceState.getBoolean(BUNDLE_CONTROL_PANEL_IS_SHOWING, false)) {
-                    mMediaController.show(0);
-                } else {
-                    mMediaController.hide();
-                }
-            }
         }
     }
 
