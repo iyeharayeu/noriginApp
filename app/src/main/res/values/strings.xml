@@ -1,0 +1,4 @@
+<resources>
+    <string name="error_string">Error has occurred during data loading…</string>
+    <string name="error_permission_denied">permission denied</string>
+</resources>

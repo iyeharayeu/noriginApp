@@ -1,0 +1,55 @@
+<FrameLayout
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:keepScreenOn="true">
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/pick_movie_control_container"
+        android:layout_width="match_parent"
+        android:layout_gravity="bottom"
+        android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:id="@+id/pick_movie_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:visibility="visible"
+        android:background="@color/blackTransparent"
+        tools:ignore="ContentDescription">
+
+        <ImageView
+            style="@style/styleCoverImage"/>
+
+        <ImageView
+            style="@style/styleCoverImage"/>
+
+        <ImageView
+            style="@style/styleCoverImage"/>
+
+    </LinearLayout>
+
+    <com.google.android.exoplayer.AspectRatioFrameLayout
+        android:id="@+id/pick_movie_video_frame"
+        android:layout_width="match_parent"
+
+        android:layout_height="250dp"
+        android:layout_gravity="center">
+
+        <SurfaceView
+            android:id="@+id/pick_movie_surface_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
+        <ProgressBar
+            android:id="@+id/pick_movie_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+    </com.google.android.exoplayer.AspectRatioFrameLayout>
+</FrameLayout>

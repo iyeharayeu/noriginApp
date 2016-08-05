@@ -1,0 +1,55 @@
+apply plugin: 'com.android.application'
+
+def APP_ID = 'MOVIE_ID'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.1"
+
+    defaultConfig {
+        applicationId "com.norigin"
+        minSdkVersion 16
+        targetSdkVersion 24
+        versionCode 1
+        versionName "1.0"
+        signingConfig signingConfigs.debug
+    }
+
+    productFlavors{
+
+        bunny {
+            applicationIdSuffix ".bigbuckbunny"
+            resValue "string", "app_name", "Norigin BigBuckBunny"
+            buildConfigField 'String', APP_ID, '"1"'
+        }
+
+        sintel {
+            applicationIdSuffix ".sintel"
+            resValue "string", "app_name", "Norigin Sintel"
+            buildConfigField 'String', APP_ID, '"2"'
+        }
+
+        elephants {
+            applicationIdSuffix ".elephants"
+            resValue "string", "app_name", "Norigin Elephants"
+            buildConfigField 'String', APP_ID, '"3"'
+        }
+
+    }
+
+    buildTypes{
+        debug {
+            debuggable true
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:support-v4:24.1.1'
+    compile 'com.android.support:appcompat-v7:24.1.1'
+    compile 'com.google.code.gson:gson:2.4'
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'io.reactivex:rxjava:1.1.6'
+    compile project(path: ':exoplayer_library')
+}

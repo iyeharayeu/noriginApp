@@ -1,0 +1,31 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="BlackAppTheme" parent="@style/Theme.AppCompat.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:background">@android:color/black</item>
+    </style>
+
+    <style name="title_common">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="subtitle_common">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="styleCoverImage">
+            <item name="android:layout_width">match_parent</item>
+            <item name="android:scaleType">centerCrop</item>
+            <item name="android:layout_height">@dimen/image_height</item>
+            <item name="android:layout_margin">@dimen/activity_horizontal_margin</item>
+            <item name="android:layout_weight">1</item>
+    </style>
+
+</resources>
